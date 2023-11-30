@@ -10,6 +10,11 @@
 Zem_t *Fork;
 int N = 0;  //N: number of philosophers
 
+typedef struct {
+  int numLoops;
+  int p;
+} arg_t;
+
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
   return p;
@@ -48,13 +53,55 @@ void eat() {
 }
 
 // What a dining philosopher does
-void philosopher(int p) {
-  think();
-  getForks(p);
-  eat();
-  putForks(p);
+void philosopher(void *arg) {
+  arg_t *args = (arg_t *) arg;
+  for(int i = 0; i < args->numLoops; i++) {
+    think();
+    getForks(args->p);
+    eat();
+    putForks(args->p);
+  }
+  return NULL;
 }
 
 int main(int argc, char *argv[]) {
-  
+  // check if user used diningPhilosophers correctly
+  if(argc != 2) {
+    printf("usage: diningPhilosophers numberOfPhilosophers\n");
+    exit(1);
+  }
+
+  N = atoi(argv[1]);    // get user input into N
+  // check if user entered correct number of philosophers
+  if(N < 3 || N > 20) {
+    printf("number of philosophers must be between 3 and 20\n");
+    exit(1);
+  }
+
+  // initialize forks
+  Zem_t Fork[N];
+  for(int i = 0; i < N; i++) {
+    Zem_init(&Fork[i], 1);
+  }
+  printf("There are %d dining philosophers today\n", N);
+
+  printf("Dining starts\n");
+
+  // initialize philosophers
+  pthread_t ph[N];
+  arg_t args[N];
+  for(int i = 0; i < N; i++) {
+    args[i].p = i;
+    args[i].numLoops = 10;
+    Pthread_create(&ph[i], NULL, philosopher, &args[i]);
+  }
+
+  // joining philosopher threads (i think?)
+  for(int i = 0; i < N; i++) {
+    Pthread_join(ph[i], NULL);
+  }
+
+  printf("Dining finished\n");
+
+  exit(0);
 }
