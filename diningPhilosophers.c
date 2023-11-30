@@ -17,11 +17,13 @@ typedef struct {
 
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
+  printf("left: %d\n", p);
   return p;
 }
 
 // Gets and returns the fork to the right of philosopher p
 int right(int p) {
+  printf("right: %d\n", p);
   return ((p+1)%N);
 }
 
@@ -44,16 +46,18 @@ void putForks(int p) {
 
 // Philosopher thinks
 void think() {
+  printf("think");
   sleep(1);
 }
 
 // Philosopher eats
 void eat() {
+  printf("eat");
   sleep(1);
 }
 
 // What a dining philosopher does
-void philosopher(void *arg) {
+void *philosopher(void *arg) {
   arg_t *args = (arg_t *) arg;
   for(int i = 0; i < args->numLoops; i++) {
     think();
@@ -85,14 +89,16 @@ int main(int argc, char *argv[]) {
   }
   printf("There are %d dining philosophers today\n", N);
 
-  printf("Dining starts\n");
+  printf("Dining started\n");
+
+// NOT WORKING FROM HERE ON OUT
 
   // initialize philosophers
   pthread_t ph[N];
   arg_t args[N];
   for(int i = 0; i < N; i++) {
     args[i].p = i;
-    args[i].numLoops = 10;
+    args[i].numLoops = 1;
     Pthread_create(&ph[i], NULL, philosopher, &args[i]);
   }
 
