@@ -1,3 +1,5 @@
+// *Algorithm 1*
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -12,13 +14,13 @@ int N = 0;  //N: number of philosophers
 
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
-  printf("left: %d\n", p);
+  //printf("left: %d\n", p);
   return p;
 }
 
 // Gets and returns the fork to the right of philosopher p
 int right(int p) {
-  printf("right: %d\n", p);
+  //printf("right: %d\n", p);
   return ((p+1)%N);
 }
 
@@ -69,7 +71,8 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  N = atoi(argv[1]);    // get user input into N
+  N = atoi(argv[1]);
+
   // check if user entered correct number of philosophers
   if(N < 3 || N > 20) {
     printf("number of philosophers must be between 3 and 20\n");
@@ -81,24 +84,17 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < N; i++) {
     Zem_init(&Fork[i], 1);
   }
-  printf("There are %d dining philosophers today\n", N);
 
   printf("dining: started\n");
 
   // initialize philosophers
   pthread_t ph[N];
   for(int i = 0; i < N; i++) {
-//    a[i].pid = i;
-//    a[i].numLoops = 5;
     int p = i;
     Pthread_create(&ph[i], NULL, philosopher, (void *)p);
   }
 
-   //joining philosopher threads (i think?)
-    //for(int i = 0; i < N; i++) {
-     //Pthread_join(ph[i], NULL);
-  //}
-
+  // run forever, philosophers always dining
   while(1){}
 
   printf("dining: finished\n");
