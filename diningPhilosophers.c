@@ -12,7 +12,7 @@ int N = 0;  //N: number of philosophers
 
 typedef struct {
   int numLoops;
-  int p;
+  int pid;
 } arg_t;
 
 // Gets and returns the fork to the left of philosopher p
@@ -31,39 +31,46 @@ int right(int p) {
 void getForks(int p) {
   // checks if its the 0th philosopher at table
   if(p == 0) {
+    printf("get: %d\n", p);
     Zem_wait(&Fork[right(p)]);
     Zem_wait(&Fork[left(p)]);
   }
+  printf("get: %d\n", p);
   Zem_wait(&Fork[left(p)]);
   Zem_wait(&Fork[right(p)]);
 }
 
 // Puts fork down that philosopher p is done using
 void putForks(int p) {
+  printf("put: %d\n", p);
   Zem_post(&Fork[left(p)]);
   Zem_post(&Fork[right(p)]);
 }
 
 // Philosopher thinks
 void think() {
-  printf("think");
+  printf("think\n");
   sleep(1);
+  return;
 }
 
 // Philosopher eats
 void eat() {
-  printf("eat");
+  printf("eat\n");
   sleep(1);
+  return;
 }
 
 // What a dining philosopher does
 void *philosopher(void *arg) {
   arg_t *args = (arg_t *) arg;
+  int p = args->pid;
+
   for(int i = 0; i < args->numLoops; i++) {
     think();
-    getForks(args->p);
+    getForks(p);
     eat();
-    putForks(args->p);
+    putForks(p);
   }
   return NULL;
 }
@@ -89,17 +96,18 @@ int main(int argc, char *argv[]) {
   }
   printf("There are %d dining philosophers today\n", N);
 
-  printf("Dining started\n");
+  printf("dining: started\n");
 
 // NOT WORKING FROM HERE ON OUT
 
   // initialize philosophers
   pthread_t ph[N];
-  arg_t args[N];
+  arg_t a[N];
   for(int i = 0; i < N; i++) {
-    args[i].p = i;
-    args[i].numLoops = 1;
-    Pthread_create(&ph[i], NULL, philosopher, &args[i]);
+    a[i].pid = i;
+    a[i].numLoops = 5;
+    Pthread_create(&ph[i], NULL, philosopher, &a[i]);
+    printf("finishes %d\n", i);
   }
 
   // joining philosopher threads (i think?)
@@ -107,7 +115,7 @@ int main(int argc, char *argv[]) {
     Pthread_join(ph[i], NULL);
   }
 
-  printf("Dining finished\n");
+  printf("dining: finished\n");
 
   exit(0);
 }
