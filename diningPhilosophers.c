@@ -10,11 +10,6 @@
 Zem_t *Fork;
 int N = 0;  //N: number of philosophers
 
-typedef struct {
-  int numLoops;
-  int pid;
-} arg_t;
-
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
   printf("left: %d\n", p);
@@ -29,12 +24,6 @@ int right(int p) {
 
 // Picks up fork that philosopher p needs to use
 void getForks(int p) {
-  // checks if its the 0th philosopher at table
-  if(p == 0) {
-    printf("get: %d\n", p);
-    Zem_wait(&Fork[right(p)]);
-    Zem_wait(&Fork[left(p)]);
-  }
   printf("get: %d\n", p);
   Zem_wait(&Fork[left(p)]);
   Zem_wait(&Fork[right(p)]);
@@ -63,10 +52,8 @@ void eat() {
 
 // What a dining philosopher does
 void *philosopher(void *arg) {
-  arg_t *args = (arg_t *) arg;
-  int p = args->pid;
-
-  for(int i = 0; i < args->numLoops; i++) {
+  int p = (int) arg;
+  for(int i = 0;; i++) {
     think();
     getForks(p);
     eat();
@@ -90,7 +77,7 @@ int main(int argc, char *argv[]) {
   }
 
   // initialize forks
-  Zem_t Fork[N];
+  Fork = (Zem_t *)malloc(N * sizeof(Zem_t));
   for(int i = 0; i < N; i++) {
     Zem_init(&Fork[i], 1);
   }
@@ -98,22 +85,21 @@ int main(int argc, char *argv[]) {
 
   printf("dining: started\n");
 
-// NOT WORKING FROM HERE ON OUT
-
   // initialize philosophers
   pthread_t ph[N];
-  arg_t a[N];
   for(int i = 0; i < N; i++) {
-    a[i].pid = i;
-    a[i].numLoops = 5;
-    Pthread_create(&ph[i], NULL, philosopher, &a[i]);
-    printf("finishes %d\n", i);
+//    a[i].pid = i;
+//    a[i].numLoops = 5;
+    int p = i;
+    Pthread_create(&ph[i], NULL, philosopher, (void *)p);
   }
 
-  // joining philosopher threads (i think?)
-  for(int i = 0; i < N; i++) {
-    Pthread_join(ph[i], NULL);
-  }
+   //joining philosopher threads (i think?)
+    //for(int i = 0; i < N; i++) {
+     //Pthread_join(ph[i], NULL);
+  //}
+
+  while(1){}
 
   printf("dining: finished\n");
 
