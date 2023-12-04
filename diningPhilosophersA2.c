@@ -67,14 +67,14 @@ void putForks(int p) {
 // Philosopher thinks
 void think() {
   printf("think\n");
-  sleep(1);
+  usleep(10);
   return;
 }
 
 // Philosopher eats
 void eat() {
   printf("eat\n");
-  sleep(1);
+  usleep(10);
   return;
 }
 

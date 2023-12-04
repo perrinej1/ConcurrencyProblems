@@ -2,8 +2,9 @@
    Algorithm 1
    By Josh Perrine
    Each philosopher picks up first their left fork, and then their right fork.
-   Used littleOldWoman.c and the Day32 code from modules to help
-   This algorithm leads to deadlock and starvation
+   Used littleOldWoman.c and the Day32 code from modules to help.
+   usleep() allows for more granual control than sleep().
+   This algorithm leads to deadlock and starvation.
 */
 
 #include <stdio.h>
@@ -47,14 +48,14 @@ void putForks(int p) {
 // Philosopher thinks
 void think() {
   printf("think\n");
-  sleep(1);
+  usleep(10);
   return;
 }
 
 // Philosopher eats
 void eat() {
   printf("eat\n");
-  sleep(1);
+  usleep(10);
   return;
 }
 
