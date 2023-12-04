@@ -29,19 +29,23 @@ void getForks(int p) {
 
   // loop until both forks available
   while(1){
-    int leftFork = left(p);
-    int rightFork = right(p);
+    //int leftFork = left(p);
+    //int rightFork = right(p);
 
     // try to aquire both forks SOMETHING WRONG HERE I THINK
-    Zem_wait(&Fork[leftFork]);
-    if(Zem_wait(&Fork[rightFork])){
+    Zem_wait(&Fork[left(p)]);
+    printf("left fork gotten... perhaps?\n");
+    if(sem_trywait(&Fork[right(p)])){
+      printf("both forks gotten\n");
       // should succesfully get both forks
       return;
     }
     else{
       // release fork if both not aquired
-      Zem_post(&Fork[leftFork]);
+      printf("only one fork gotten\n");
+      Zem_post(&Fork[left(p)]);
     }
+    printf("end of if statement\n");
   }
 
   //Zem_wait(&Fork[left(p)]);
