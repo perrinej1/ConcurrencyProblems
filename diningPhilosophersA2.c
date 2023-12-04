@@ -1,3 +1,12 @@
+/*
+   Algorithm 2
+   By Josh Perrine
+   A philosopher is allowed to pick up both of her forks together,
+   only if both of them are available.
+   Used A1 code, majority of edits in getForks(int p) function.
+   This algorithm does not lead to any deadlock or starvation.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -12,47 +21,42 @@ int N = 0;  //N: number of philosophers
 
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
-  //printf("left: %d\n", p);
   return p;
 }
 
 // Gets and returns the fork to the right of philosopher p
 int right(int p) {
-  //printf("right: %d\n", p);
   return ((p+1)%N);
 }
 
-// Probably got to do something with getForks
 // Picks up fork that philosopher p needs to use
 void getForks(int p) {
   printf("get: %d\n", p);
 
   // loop until both forks available
   while(1){
-    //int leftFork = left(p);
-    //int rightFork = right(p);
-
-    // try to aquire both forks SOMETHING WRONG HERE I THINK
     Zem_wait(&Fork[left(p)]);
-    printf("left fork gotten... perhaps?\n");
+
+    // check if right fork is available using sem_trywait
     if(sem_trywait(&Fork[right(p)])){
-      printf("both forks gotten\n");
-      // should succesfully get both forks
+      printf("both forks aquired\n");
+
+      // should succesfully aquire both forks
       return;
     }
+
     else{
       // release fork if both not aquired
-      printf("only one fork gotten\n");
+      printf("only one fork aquired\n");
+
       Zem_post(&Fork[left(p)]);
     }
-    printf("end of if statement\n");
-  }
 
-  //Zem_wait(&Fork[left(p)]);
-  //Zem_wait(&Fork[right(p)]);
+    //printf("end of if statement\n");
+
+  }
 }
 
-// Maybe got to do something with put forks
 // Puts fork down that philosopher p is done using
 void putForks(int p) {
   printf("put: %d\n", p);

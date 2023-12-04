@@ -1,4 +1,5 @@
-/* Algorithm 1
+/*
+   Algorithm 1
    By Josh Perrine
    Each philosopher picks up first their left fork, and then their right fork.
    Used littleOldWoman.c and the Day32 code from modules to help
