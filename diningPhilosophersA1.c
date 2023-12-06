@@ -48,7 +48,7 @@ void putForks(int p) {
 // Philosopher thinks
 void think() {
   printf("think\n");
-  usleep(10);
+  usleep(10);     //<- usleep faster than sleep.
   return;
 }
 
