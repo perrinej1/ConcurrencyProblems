@@ -8,8 +8,9 @@
 #include "zemaphore.h"
 
 Zem_t *Fork;
-Zem_t *Seat;    // Seat semaphore for the table and philosophers to sit at
-int N = 0;  //N: number of philosophers
+Zem_t *Table;
+int N = 0;      //N: number of philosophers
+int seats = 0;  //seats: number of seats at table
 
 // Gets and returns the fork to the left of philosopher p
 int left(int p) {
@@ -26,17 +27,33 @@ int right(int p) {
 // maybe want to modify getForks where a philosopher sits before getting a fork?
 // Picks up fork that philosopher p needs to use
 void getForks(int p) {
-  printf("get: %d\n", p);
-  Zem_wait(&Fork[left(p)]);
-  Zem_wait(&Fork[right(p)]);
+  // check if the table is full, 0 seats left
+  while(1){
+    if(seats != 0){
+      printf("at table %d\n", p);
+      Zem_wait(&Table);
+
+      printf("get: %d\n", p);
+      Zem_wait(&Fork[right(p)]);
+      Zem_wait(&Fork[left(p)]);
+
+      printf("there are %d seats left", seats);
+      seats--;
+      return;
+    }
+  }
 }
 
 // maybe have to modify this too
 // Puts fork down that philosopher p is done using
 void putForks(int p) {
   printf("put: %d\n", p);
-  Zem_post(&Fork[left(p)]);
+  printf("leaves table, there are %d seats left", seats);
+  Zem_post(&Table);
+  seats++;
+
   Zem_post(&Fork[right(p)]);
+  Zem_post(&Fork[left(p)]);
 }
 
 // Philosopher thinks
@@ -74,6 +91,7 @@ int main(int argc, char *argv[]) {
   }
 
   N = atoi(argv[1]);
+  seats = N-1;   // set amount of seats to N-1
 
   // check if user entered correct number of philosophers
   if(N < 3 || N > 20) {
@@ -87,11 +105,9 @@ int main(int argc, char *argv[]) {
     Zem_init(&Fork[i], 1);
   }
 
-  // initialize seats
-  Seat = (Zem_t *)malloc(N * sizeof(Zem_t));
-  for(int i = 0; i < N; i++) {
-    Zem_init(&Fork[i], 1);
-  }
+  // initialize table
+  Table = (Zem_t *)malloc(N * sizeof(Zem_t));
+  Zem_init(&Table, 1);
 
   printf("dining: started\n");
 
