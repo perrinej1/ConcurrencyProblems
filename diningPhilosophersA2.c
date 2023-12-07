@@ -41,7 +41,7 @@ void getForks(int p) {
     if(sem_trywait(&Fork[right(p)])){
       printf("both forks aquired\n");
 
-      // should succesfully aquire both forks
+      // should successfully aquire both forks
       return;
     }
 

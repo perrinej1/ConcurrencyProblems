@@ -1,3 +1,17 @@
+/*
+   Algorithm 3
+   By Josh Perrine
+   Each philosopher has their own seat at the table, but they do all of
+   their thinking away from the table.  When they get hungry, they try to
+   sit at the table, and then picks up their forks
+   (first the right and then the left). Allow at most N-1 philosophers to sit
+   at the table simultaneously.  When a philosopher is done eating,
+   they get up from the table.
+   Used A1 code, majority of edits in getForks(int p) and putForks(int p)
+   functions, added a Table semephore for philosophers.
+   This algorithm does not lead to any deadlock or starvation.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -24,31 +38,31 @@ int right(int p) {
   return ((p+1)%N);
 }
 
-// maybe want to modify getForks where a philosopher sits before getting a fork?
 // Picks up fork that philosopher p needs to use
 void getForks(int p) {
-  // check if the table is full, 0 seats left
+  // always checks for a seat at the table
   while(1){
+    // checks if table is full
     if(seats != 0){
-      printf("at table %d\n", p);
+      // philosopher sits at table
       Zem_wait(&Table);
 
       printf("get: %d\n", p);
       Zem_wait(&Fork[right(p)]);
       Zem_wait(&Fork[left(p)]);
 
-      printf("there are %d seats left", seats);
+      // should successfully sit down
       seats--;
       return;
     }
   }
 }
 
-// maybe have to modify this too
 // Puts fork down that philosopher p is done using
 void putForks(int p) {
   printf("put: %d\n", p);
-  printf("leaves table, there are %d seats left", seats);
+
+  // philosopher gets up from table
   Zem_post(&Table);
   seats++;
 
@@ -70,7 +84,6 @@ void eat() {
   return;
 }
 
-// another way could be adding the seats into here?
 // What a dining philosopher does
 void *philosopher(void *arg) {
   int p = (int) arg;
@@ -106,6 +119,7 @@ int main(int argc, char *argv[]) {
   }
 
   // initialize table
+  // indicates where philosophers will sit while eating
   Table = (Zem_t *)malloc(N * sizeof(Zem_t));
   Zem_init(&Table, 1);
 
